@@ -1,28 +1,24 @@
-import { useState } from 'react'
+import axios from 'axios'
+import { useState, useEffect } from 'react'
 import { Contacts, FilterForm } from './components/Contacts'
 import AddForm from './components/AddForm'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas',
-      number: '040111111'
-    },
-    {
-      name: 'Pirkko Kallas',
-      number: '123456789'
-    },
-    {
-      name: 'Jukka Hellas',
-      number: '0502222222'
-    },
-    {
-      name: 'Hertta Maailma',
-      number: '0100100'
-    }
-  ]) 
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  
+  useEffect(() => {
+    console.log("effect")
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        console.log('promise resolved')
+        setPersons(response.data)
+      })
+  }, [])
+
 
   const addContact = (event) => {
     event.preventDefault()
