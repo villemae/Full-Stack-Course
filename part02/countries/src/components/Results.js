@@ -1,7 +1,20 @@
-const Country = ({ country }) => {
-    console.log(country.languages)
+import { useEffect, useState } from "react"
+import axios from "axios"
+
+const CountryList = ({ countries, handleSearch }) => {
+    return (
+            <ul>
+                {countries.map(country => 
+                    <li key={country.cca2}>
+                        {country.name.common} 
+                        <button value={country.name.common} onClick={handleSearch}>show</button>
+                    </li>)}
+            </ul>
+    )
+}
+
+const CountryDetails = ({ country }) => {
     const langs = Object.values(country.languages)
-    console.log(langs)
     return (
         <>
             <h1>{country.name.common}</h1>
@@ -21,15 +34,54 @@ const Country = ({ country }) => {
     )
 }
 
+const Weather = ({ weather }) => {
+    if (weather !== null) {
+        return (
+            <>
+                <h3>Weather in {weather.name}</h3>
+                <p>temperature: {weather.main.temp} °C</p>
+                <img src={`http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt="Weather Icon"/>
+                <p>wind: {weather.wind.speed}m/s</p>
+            </>
+        )
+    } else {
+        return null
+    }
+}
+
+const Country = ({ country }) => {
+
+    const api_key = process.env.REACT_APP_API_KEY
+    const [weather, setWeather] = useState(null)
+
+    useEffect(() => {
+        console.log("WeatherEffect")
+        axios
+          .get(`https://api.openweathermap.org/data/2.5/weather?q=${country.capital}&appid=${api_key}&units=metric`)
+          .then(response => {
+            console.log('promise resolved')
+            setWeather(response.data)
+          })
+      }, [])
+    
+    return (
+        <>
+            <CountryDetails country={country} />
+            <Weather weather={weather} />
+        </>
+    )
+}
+
 const Results = (props) => {
 
     if (props.search === '') {
-        return
+        return (
+            <p>Nothing to show</p>
+        )
     }
     const filtered = props.countries.filter(country => 
         country.name.common.toLowerCase().includes(props.search.toLowerCase()))
     if (filtered.length === 1) {
-        console.log(filtered[0])
         return (
             <Country country={filtered[0]} />
         )
@@ -41,13 +93,7 @@ const Results = (props) => {
     }
     else if ( 1 < filtered.length < 10) {
         return (
-            <ul>
-                {filtered.map(country => 
-                    <li key={country.cca2}>
-                        {country.name.common} 
-                        <button value={country.name.common} onClick={props.handleSearch}>show</button>
-                    </li>)}
-            </ul>
+            <CountryList countries={filtered} handleSearch={props.handleSearch} />
         )
     }
 }
