@@ -1,7 +1,7 @@
-import axios from 'axios'
 import { useState, useEffect } from 'react'
 import { Contacts, FilterForm } from './components/Contacts'
 import AddForm from './components/AddForm'
+import phonebookService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,9 +11,9 @@ const App = () => {
   
   useEffect(() => {
     console.log("effect")
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
+    phonebookService
+    .getAll()
+    .then(response => {
         console.log('promise resolved')
         setPersons(response.data)
       })
@@ -22,15 +22,21 @@ const App = () => {
 
   const addContact = (event) => {
     event.preventDefault()
-    if (persons.find(elem => elem.name === newName) === undefined) {
-      const nameObject = {
+    if (persons.find(person => person.name === newName) === undefined) {
+      const contactObject = {
         name: newName,
         number: newNumber
       }
-      setPersons(persons.concat(nameObject))
+      phonebookService
+      .create(contactObject)
+      .then(response => {
+        setPersons(persons.concat(response.data))
+      })
     } else {
       alert(`${newName} is already in the phonebook`)
     }
+    setNewName('')
+    setNewNumber('')
   }
 
   const handleNameChange = (event) => {
