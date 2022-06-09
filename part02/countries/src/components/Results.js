@@ -22,10 +22,12 @@ const Country = ({ country }) => {
 }
 
 const Results = (props) => {
+
     if (props.search === '') {
         return
     }
-    const filtered = props.countries.filter(country => country.name.common.toLowerCase().includes(props.search))
+    const filtered = props.countries.filter(country => 
+        country.name.common.toLowerCase().includes(props.search.toLowerCase()))
     if (filtered.length === 1) {
         console.log(filtered[0])
         return (
@@ -41,7 +43,10 @@ const Results = (props) => {
         return (
             <ul>
                 {filtered.map(country => 
-                    <li key={country.cca2}>{country.name.common}</li>)}
+                    <li key={country.cca2}>
+                        {country.name.common} 
+                        <button value={country.name.common} onClick={props.handleSearch}>show</button>
+                    </li>)}
             </ul>
         )
     }
