@@ -11,14 +11,16 @@ const FilterForm = (props) => {
   )
 }
 
-const Contacts = ({ persons, filter }) => {
+const Contacts = ({ persons, filter, deleteContact }) => {
   const filtered = persons.filter(person => person.name.toLowerCase().includes(filter))
   return (
     <>
       <h2>Numbers</h2>
       <ul>
         {filtered.map(person =>
-          <li key={person.name}>{person.name} {person.number}</li>
+          <li key={person.id}>{person.name} {person.number} 
+          <button onClick={() => deleteContact(person.id)}>Delete</button>
+          </li>
         )} 
       </ul>
     </>
